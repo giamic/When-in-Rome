@@ -8,7 +8,7 @@ from setuptools import find_packages
 
 def read_version() -> str:
     """
-    This script reads the information inside AugmentedNet/__init__.py without
+    This script reads the information inside Code/__init__.py without
      importing the package, which is not allowed inside the setup.py file
     """
     version = None
@@ -20,9 +20,7 @@ def read_version() -> str:
         if line.startswith("__version__"):
             version = line.split('"')[1]
     if version is None:
-        raise RuntimeError(
-            "Can't read package version from file AugmentedNet/__init__.py"
-        )
+        raise RuntimeError("Can't read package version from file Code/__init__.py")
     return version
 
 
