@@ -1,13 +1,15 @@
 ![GitHub top language](https://img.shields.io/github/languages/top/MarkGotham/When-in-Rome)
 ![GitHub issues](https://img.shields.io/github/issues-raw/MarkGotham/When-in-Rome)
 ![GitHub last commit](https://img.shields.io/github/last-commit/MarkGotham/When-in-Rome)
+![GitHub repo size](https://img.shields.io/github/repo-size/MarkGotham/When-in-Rome)
+![License](https://img.shields.io/badge/license-CC%20BY--SA%204.0-9)
 
 # When in Rome
 
-'When in Rome' brings together all of the world's harmonic analyses in encoded formats into a single, consistent repository.
+'When in Rome' brings together all of the world's functional harmonic analyses in encoded formats into a single, consistent repository.
 This enables musicians and developers to interact with that great body of work at scale, with minimal overheads.
 
-In total, there are now approximately 450 analyses and 100,000 Roman numerals in here.
+In total, there are now approximately 500 analyses and 100,000 Roman numerals in here.
 
 Additionally, 'When in Rome' provides code for working with this corpora, building on top of the [music21](https://github.com/cuthbertLab/music21/) library for music analysis.
 
@@ -52,6 +54,15 @@ We find this more logical that re-organisation by composer.
 - `score.mxl`
   - What: A conversion of the corpus score into `.mxl` format for consistency and compressed to minimise file/corpus size.
   - How to use: Open in any software for music notation (e.g., [MuseScore](https://musescore.org/)).
+  - Where there is no local `score.mxl`, there is a `remote_score.json` instead. 
+    - This file points to an externally hosted score _in a format which music21 can parse_. 
+    - This is designed to prevent duplication and automatically include source updates.
+    - Note that MuseScore files are included in a local conversion (`.mxl`) rather than remote.
+      - This is because music21 cannot parse them and conversion requires the `mscore` package 
+        (see `Code.updates_and_checks.convert_musescore_score_corpus`).
+    - For downloading a local copy of remote files, see `Code.updates_and_checks.remote_scores` 
+      and the argument `convert_and_write_local`. Read those docs for details and warnings.
+    - Please check and observe the licence of all scores, especially those hosted externally.
 
 - `analysis.txt`
   - What: A human analysis in plain text.
@@ -68,8 +79,17 @@ We find this more logical that re-organisation by composer.
   - How to use: As a point of reference for full disclosure on the conversion process.
 
 - `analysis_<analyst>.txt`
-  - What: An alternative analysis, e.g., copy of an original analysis exactly as converted for cases where significant changes have been made.
-  - How to use: As a point of reference for full disclosure on the conversion process.
+  - What: An alternative analysis. This takes one of two forms:
+    - A copy of an original analysis exactly as converted for cases where significant changes 
+      have been made to that analysis. See, for example,
+      [this edit](/Corpus/Piano_Sonatas/Beethoven,_Ludwig_van/Op010_No1/1/analysis.txt)
+      [of this "original"](/Corpus/Piano_Sonatas/Beethoven,_Ludwig_van/Op010_No1/1/analysis_BPS.txt)
+    - A second analysis of the same work. The ['TAVERN'](https://github.com/jcdevaney/TAVERN) 
+      dataset includes pairs of analyses of the same work. In order to ensure there is exactly 
+      one `analysis.txt` throughout, we name the pair `analysis.txt` (note not 
+      `analysis_A.txt`) and `analysis_B.txt`.
+  - How to use: All such text files can be opened in the normal way. "Original conversions" 
+    serve as a point of reference for full disclosure on the conversion process.
 
 ### Optional extra files (not included but easy to generate):
 
@@ -132,6 +152,10 @@ Originally in the 'RomanText' format (no conversion needed):
 ## Code and Lists
 
 For developers, please see the individual code files for details of what they do and how.
+
+Run code scripts from the repo's base directory (`When-in-Rome`) using the format:
+`>>> python3 -m Code.<name_of_file>`
+
 Briefly, this repo. includes:
 - [The Roman Umpire](/Code/romanUmpire.py) for providing automatic 'feedback' files.
 It takes in a harmonic analysis and the corresponding score to assess how well they match.
@@ -143,12 +167,15 @@ It takes in a harmonic analysis and the corresponding score to assess how well t
 
 ### Licence
 
-New content in this repository, including the new analyses, most code, and the conversion (specifically) of existing analyses is available under the [CC BY-SA licence](https://creativecommons.org/licenses/by-sa/3.0/).
-The [Roman Umpire](Code/romanUmpire.py) and [Anthology](Code/anthology.py) scripts are subject to the slightly more restrictive [CC BY-NC](https://creativecommons.org/licenses/by-nc/3.0/).
-If you wish to use these scripts in a commercial context then please get in touch to discuss your plans.
+New content in this repository, including the new analyses, code, and the conversion (specifically) of existing analyses is available under the [CC BY-SA licence](https://creativecommons.org/licenses/by-sa/4.0/) (a free culture licence).
 
 For analyses that originated elsewhere and have been converted into the format used here, please refer to the original source for licence.
 Links are provided to those original sources throughout the repository including the itemised list above and within every `analysis.txt` file.
+
+These external licences vary.
+As far as we can tell, all the content here is either original or properly credited and fair to use in this way.
+If you think you see an issue please let us know.
+Again, if you are simply looking for a scores in a maximally permissive licence, then hea to the [OpenScore collections](https://github.com/openscore) which are notable for using CC0.
 
 For research and other public-facing projects making use of this work, please cite or otherwise acknowledge one or more of the papers listed below as appropriate to your project.
 
@@ -170,29 +197,10 @@ Please feel free to re-analyse these works by using the existing analysis as a t
 - For more thoroughly divergent analyses, a new file may be warranted. In that case, perhaps credit the original analyst too in the format - `Analyst: [Your name] after [their name]`
 - For any cases of clear errors, please submit a pull request with the correction.
 
-For details of the RomanText format used to encode analyses here, see our [technical specification paper](http://archives.ismir.net/ismir2019/paper/000012.pdf) or the relevant corners of the music21's [code](https://github.com/cuthbertLab/music21/tree/master/music21/romanText), [module reference](http://web.web.mit.edu/music21/doc/moduleReference/moduleRoman.html), or (if in doubt) [user guide](http://web.mit.edu/music21/doc/usersGuide/usersGuide_23_romanNumerals.html)
-
-### Spotlight on 6^ and 7^ in minor mode
-
-This is one aspect of roman numeral analysis that is particularly liable to inconsistency and in need of a clear protocol.
-Here, we follow the music21 default of 'quality', which is among four supported options:
-- Quality: the status of the triad as major or minor (upper or lower case, not accounting for diminished / augmented at this stage) alters the output chord’s root. In this case, ‘vii’ in a minor returns g# minor and the same holds for a diminished alteration (’viio’ = g# diminished). ‘VII’ sets the root to G natural, so ‘VII’ = G major and VII+ is G augmented.
-- Cautionary: like 'quality', except that the ‘cautionary’ option ignores one chromatic alteration in the ‘sensible’ direction. So, ‘#vii’ would return g# minor, and not g## minor. Likewise, ‘bVII’ would be G major and not Gb major. This is useful to accommodating cases much of the realistic variation in minor mode conventions — the single, ‘sensible' sharp or flat is like a ‘cautionary accidental’. Further sharps and flats in the ‘sensible’ direction, and any sharps / flats in the opposite direction do change the root.
-- Sharp / Raised: explicitly sets the 6th and / or 7th degrees to ‘Sharp / Raised’ (F# and G# in a minor).
-- Flat / Lowered: the same for flatten / lowered roots (F and G in a minor).
-
-The following tables set out how these options relate to each other in a minor. The first moves in a logical direction for  sharp / flat direction modifications. The second sets out the opposite direction, largely for the sake of completeness.
-
-|“Right” direction|##vii|#vii|vii|VII|bVII|bbVII|
-|---|---|---|---|---|---|---|
-|Quality|g###|g##|g#|G|Gb|Gbb|
-|Cautionary|g##|g#|g#|G|G|Gb|
-|Sharp / Raised|g###|g##|g#|G#|G|Gb|
-|Flat / Lowered|g##|g#|g|G|Gb|Gbb|
-
-|“Wrong” direction|bbvii|bvii|vii|VII|VII#|VII##|
-|---|---|---|---|---|---|---|
-|Quality|gb|g|g#|G|G#|G##|
-|Cautionary|gb|g|g#|G|G#|G##|
-|Sharp / Raised|gb|g|g#|G#|G##|G###|
-|Flat / Lowered|gbb|gb|g|G|G#|G##|
+For more details of the RomanText format used to encode analyses here, see:
+- the [technical specification paper](http://archives.ismir.net/ismir2019/paper/000012.pdf), or 
+- the relevant corners of the music21's
+  - [code](https://github.com/cuthbertLab/music21/tree/master/music21/romanText),
+  - [module reference](http://web.web.mit.edu/music21/doc/moduleReference/moduleRoman.html), or 
+  - (if in doubt) [user guide](http://web.mit.edu/music21/doc/usersGuide/usersGuide_23_romanNumerals.html)
+- this repository's own ["quick start" guide to writing in RomanText](syntax.md).
